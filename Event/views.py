@@ -6,6 +6,8 @@ from User.models import EventJoiner
 from .serializers import EventSerializerGet, EventSerializerPost
 from .models import Event
 from datetime import date
+from django.core.mail import send_mail
+from decouple import config
 
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
@@ -28,6 +30,16 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
             
         event.user.add(user)
+        try:
+            send_mail(
+                subject="Привіт друзяко, не звертай увагу це просто підтвердження що ми записали тебе на івент 🔥",
+                message=f"Привіт! Це тестовий лист від нас який підтверджує що ми записали тебе на івент {event.title} за цією датою {event.date}",
+                from_email=config("EMAIL_HOST_USER"), 
+                recipient_list=[f"{user.email}"],
+            )
+        except Exception as e:
+            pass
+        
         return Response(
             {"detail": f"User {user.username} id {user.id} joined event {event.title} succesfully"},
             status=status.HTTP_200_OK
