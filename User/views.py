@@ -1,3 +1,16 @@
 from django.shortcuts import render
+from rest_framework import viewsets
+from .models import User
+from .serializers import UserSerializerGet, UserSerializerPost
 
-# Create your views here.
+class UserViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        return User.objects.filter(id=self.request.user.id)
+    
+    def get_serializer_class(self):
+        if self.action == "list" or self.action == "retrieve":
+            return UserSerializerGet
+        return UserSerializerPost
+    
+    def perform_create(self, serializer):
+        serializer.save(organizer=self.request.user)
