@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from Event.serializers import EventSerializerGet
 from User.models import EventJoiner
+from Event.models import Event
 from datetime import date
 from django.contrib.auth.password_validation import validate_password
 
@@ -43,13 +44,12 @@ class UserSerializerPost(serializers.ModelSerializer):
 
 
 class UserSerializerGet(serializers.ModelSerializer):
-    events = EventSerializerGet(read_only=True)
+    events = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ["username", "email", "events"]
+    
+    def get_events(self, user):
+        events = Event.objects.filter(user=user)
+        return EventSerializerGet(events, many=True).data
 
-
-class UserSerializerGet(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["username", "email", "password"]
