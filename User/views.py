@@ -12,5 +12,4 @@ class UserViewSet(viewsets.ModelViewSet):
             return UserSerializerGet
         return UserSerializerPost
     
-    def perform_create(self, serializer):
-        serializer.save(organizer=self.request.user)
+    
