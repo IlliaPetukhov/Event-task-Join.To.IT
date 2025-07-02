@@ -10,11 +10,11 @@ class UserSerializerPost(serializers.ModelSerializer):
                                      })
     class Meta:
         model = User
-        field = ["username", "email", "password"]
+        fields = ["username", "email", "password"]
 
 
 class UserSerializerGet(serializers.ModelSerializer):
     events = EventSerializerGet(read_only=True)
     class Meta:
         model = User
-        field = ["username", "email", "events"]
+        fields = ["username", "email", "events"]
