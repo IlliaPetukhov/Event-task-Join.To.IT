@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,6 +14,8 @@ from decouple import config
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     permission_classes = [IsOwnderOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["title", "location_city", "date", "age_limit"]
 
     @action(detail=True, methods=["post"])
     def join(self, request, pk):
