@@ -1,2 +1,54 @@
-venv
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+
+# Django migrations
+**/migrations/
+!**/migrations/__init__.py
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE/editor configs
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Env variables
 .env
+*.env
+
+# Docker
+*.pid
+*.seed
+*.bak
+*.backup
+*.orig
+
+# Byte-compiled / optimized / DLL files
+*.so
+
+# Pytest
+.cache/
+.pytest_cache/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+
+# Static files
+staticfiles/
+media/
+
+# Git files
+.gitignore
