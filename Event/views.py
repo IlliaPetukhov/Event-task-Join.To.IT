@@ -66,7 +66,7 @@ class EventViewSet(viewsets.ModelViewSet):
             event.user.remove(user)        
             send_mail(
                     subject=f"Привіт друзяко, не звертай увагу це просто підтвердження що ми відмінили твою участь у цьому івенті {event.title}",
-                    message=f"Привіт! Це тестовий лист від нас який підтверджує що ми записали тебе на івент {event.title} за цією датою {event.date}",
+                    message=f"Привіт! Це тестовий лист від нас який підтверджує що ми відмінили твою участь у цьому івенті {event.title} за цією датою {event.date}",
                     from_email=config("EMAIL_HOST_USER"), 
                     recipient_list=[f"{user.email}"],
                 )
