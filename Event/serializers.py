@@ -7,7 +7,14 @@ from .models import Event
 class EventSerializerGet(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ["title", "description", "date", "location_city", "organizer", "age_limit"]
+        fields = ["id", "title", "description", "date", "location_city", "organizer", "age_limit"]
+
+
+
+class EventSerializerUpdate(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ["title", "description", "date", "location_city", "age_limit"]
 
 
 class EventSerializerPost(serializers.ModelSerializer):
