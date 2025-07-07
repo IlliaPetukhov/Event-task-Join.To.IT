@@ -1,27 +1,29 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .permissions import IsOwnderOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from User.models import EventJoiner
-from .serializers import EventSerializerGet, EventSerializerPost, EventSerializerUpdate
+from EventManager.emails import send_email
+from .serializers import EventSerializerGet, EventSerializerPostOrUpdateOrGetForOrganizerSerializer
 from .models import Event
 from datetime import date
-from django.core.mail import send_mail
-from decouple import config
 
 class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.all()
-    permission_classes = [IsOwnderOrReadOnly]
+    queryset = Event.objects.select_related("organizer").all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["title", "location_city", "date", "age_limit"]
 
+
     @action(detail=True, methods=["post"])
     def join(self, request, pk):
+        
         if not request.user.is_authenticated:
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
-        event = Event.objects.get(id=pk)
+        
+        event = get_object_or_404(Event, id=pk)
         user = request.user
         if user in event.user.all():
             return Response({"detail": "You are already joined this event"}, status=status.HTTP_400_BAD_REQUEST)
@@ -37,18 +39,15 @@ class EventViewSet(viewsets.ModelViewSet):
                 )
             
         event.user.add(user)
-        try:
-            send_mail(
-                subject="Привіт друзяко, не звертай увагу це просто підтвердження що ми записали тебе на івент 🔥",
-                message=f"Привіт! Це тестовий лист від нас який підтверджує що ми записали тебе на івент {event.title} за цією датою {event.date}",
-                from_email=config("EMAIL_HOST_USER"), 
-                recipient_list=[f"{user.email}"],
-            )
-        except Exception as e:
-            return Response(
-                {"detail": f"{e}"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+        
+        send_email(
+            subject="Привіт друзяко, не звертай увагу це просто підтвердження що ми записали тебе на івент 🔥",
+            message=f"Привіт! Це тестовий лист від нас який підтверджує що ми записали тебе на івент {event.title} за цією датою {event.date}", 
+            recipient_list=[f"{user.email}"],
+            user=user,
+            action="join",
+            event=event
+        )
         
         return Response(
             {"detail": f"User {user.username} id {user.id} joined event {event.title} succesfully"},
@@ -61,27 +60,33 @@ class EventViewSet(viewsets.ModelViewSet):
         if not request.user.is_authenticated:
             return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
         user = request.user
-        event = Event.objects.get(id=pk)
+        event = get_object_or_404(Event, id=pk)
         if user in event.user.all():
             event.user.remove(user)        
-            send_mail(
+            return send_email(
                     subject=f"Привіт друзяко, не звертай увагу це просто підтвердження що ми відмінили твою участь у цьому івенті {event.title}",
                     message=f"Привіт! Це тестовий лист від нас який підтверджує що ми відмінили твою участь у цьому івенті {event.title} за цією датою {event.date}",
-                    from_email=config("EMAIL_HOST_USER"), 
                     recipient_list=[f"{user.email}"],
-                )
-            return Response({"detail": f"You canceled this event {event.title}"}, status=status.HTTP_200_OK)
+                    user=user,
+                    action="cancel",
+                    event=event
+                    )
         
         return Response({"detail": f"You are not longer participating in this event {event.title}"}, status=status.HTTP_400_BAD_REQUEST)
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
             return EventSerializerGet
-        if self.action in ["update", "partial_update"]:
-            return EventSerializerUpdate
-        return EventSerializerPost
     
+        return EventSerializerPostOrUpdateOrGetForOrganizerSerializer
     
+    def get_permissions(self):
+        if self.action in ["join", "cancel", "create"]:
+            return [IsAuthenticated(), ]
+        return [IsOwnderOrReadOnly(), ]
+
+
+
     def perform_create(self, serializer):
         serializer.save(organizer=self.request.user)
 

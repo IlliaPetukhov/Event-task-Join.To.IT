@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from Event.views import EventViewSet
-from User.views import UserViewSet
+from User.views import UserViewSet, OrganizerViewSet
 from rest_framework import routers
 from django.urls import path
 from django.urls import include
@@ -39,7 +39,7 @@ schema_view = get_schema_view(
 router = routers.DefaultRouter()
 router.register("events", EventViewSet, basename="events")
 router.register("user", UserViewSet, basename="user")
-
+router.register("organizers", OrganizerViewSet, basename="organizers")
 
 urlpatterns = [
     path("admin/", admin.site.urls),

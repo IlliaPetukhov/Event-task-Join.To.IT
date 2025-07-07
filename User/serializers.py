@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from Event.serializers import EventSerializerGet
+from Event.serializers import EventSerializerPostOrUpdateOrGetForOrganizerSerializer, EventSerializerGet 
 from User.models import EventJoiner
 from Event.models import Event
 from datetime import date
@@ -44,12 +44,17 @@ class UserSerializerPost(serializers.ModelSerializer):
 
 
 class UserSerializerGet(serializers.ModelSerializer):
-    events = serializers.SerializerMethodField()
+    joined_event = EventSerializerGet(many=True)
     class Meta:
         model = User
-        fields = ["username", "email", "events"]
+        fields = ["username", "email", "joined_event"]
     
-    def get_events(self, user):
-        events = Event.objects.filter(user=user)
-        return EventSerializerGet(events, many=True).data
 
+
+
+class OrganizerSerializerGet(serializers.ModelSerializer):
+    organized_events = EventSerializerPostOrUpdateOrGetForOrganizerSerializer(source="organizer", many=True)
+    class Meta:
+        model = User
+        fields = ["username", "email", "organized_events"] 
+        
