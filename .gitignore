@@ -52,3 +52,4 @@ media/
 
 # Git files
 .gitignore
+sqlite/
