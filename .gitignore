@@ -53,3 +53,10 @@ media/
 # Git files
 .gitignore
 sqlite/
+db.sqlite3
+venv/
+chroma_storage/
+
+
+show_vectors.py
+genarate_events.py
