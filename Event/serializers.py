@@ -13,12 +13,12 @@ class EventSerializerGet(serializers.ModelSerializer):
     organizer = OrganizerSerializer()
     class Meta:
         model = Event
-        fields = ["id", "title", "description", "date", "location_city", "organizer", "age_limit"]
+        fields = ["id", "title", "description", "date", "location_city", "organizer", "age_limit", "price", "image"]
 
 
 
 class EventSerializerPostOrUpdateOrGetForOrganizerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
-        fields = ["title", "description", "date", "location_city", "age_limit"]
+        fields = ["title", "description", "date", "location_city", "age_limit", "price", "image"]
 
