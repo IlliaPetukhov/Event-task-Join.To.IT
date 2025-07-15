@@ -43,3 +43,6 @@ class Event(models.Model):
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="organizer")
     user = models.ManyToManyField(User, related_name="joined_event")
     age_limit = models.BooleanField(default=False)
+    price = models.FloatField(null=True)
+    image = models.ImageField(upload_to="event_image/", null=True)
+    
