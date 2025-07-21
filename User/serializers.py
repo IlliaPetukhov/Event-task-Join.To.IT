@@ -5,6 +5,43 @@ from User.models import EventJoiner
 from Event.models import Event
 from datetime import date
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from django.contrib.auth import authenticate
+
+
+
+
+class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, 
+                                     style={
+                                         "input_type": "password"
+                                     } 
+                                     )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop("username", None)
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        password = attrs.get("password")
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid email.")
+        
+        authenticated_user = authenticate(username=user.username, password=password)
+        if not authenticated_user:
+            raise serializers.ValidationError("Invalid email or password")
+        
+        refresh = self.get_token(authenticated_user)
+        return {
+            "refresh": str(refresh),
+            "access": str(refresh.access_token)
+        }
+    
+    
 
 
 

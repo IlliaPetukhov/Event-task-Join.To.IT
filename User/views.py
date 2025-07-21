@@ -3,7 +3,11 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from Event.permissions import ReadOnly
 from .models import User
-from .serializers import UserSerializerGet, UserSerializerPost, OrganizerSerializerGet
+from .serializers import UserSerializerGet, UserSerializerPost, OrganizerSerializerGet, EmailTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class LoginView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
 
 
 
