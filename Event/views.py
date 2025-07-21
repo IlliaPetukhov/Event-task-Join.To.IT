@@ -10,9 +10,11 @@ from EventManager.emails import send_email
 from .serializers import EventSerializerGet, EventSerializerPostOrUpdateOrGetForOrganizerSerializer
 from .models import Event
 from datetime import date
+from chroma_client import collection
+from .generate_vector import generate_embedding
+from django.db.models import Case, When
 
 class EventViewSet(viewsets.ModelViewSet):
-    queryset = Event.objects.select_related("organizer").all()
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["title", "location_city", "date", "age_limit"]
 
@@ -84,6 +86,24 @@ class EventViewSet(viewsets.ModelViewSet):
         if self.action in ["join", "cancel", "create"]:
             return [IsAuthenticated(), ]
         return [IsOwnderOrReadOnly(), ]
+    
+    def get_queryset(self):
+        ai_search = self.request.query_params.get("search")
+        if ai_search and len(ai_search) > 2:
+            search_vector = generate_embedding(f"query: {ai_search}")
+            
+            vectors = collection.query(
+                query_embeddings=[search_vector],
+                n_results=100)
+            
+            if len(vectors["ids"][0]) != 0:
+                ids = [int(pk) for pk in vectors["ids"][0]]
+                preserved_order = Case(*[When(id=int(pk), then=position) for position, pk in enumerate(ids)])
+
+                return Event.objects.select_related("organizer").filter(id__in=ids).order_by(preserved_order)
+        
+        return Event.objects.select_related("organizer").all()
+        
 
 
 
