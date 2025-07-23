@@ -3,6 +3,6 @@ from django.db import connection
 
 class EventConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'Event'
+    name = 'event'
     def ready(self):
-        import Event.signals
+        import event.signals

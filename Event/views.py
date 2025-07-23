@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .permissions import IsOwnderOrReadOnly
 from rest_framework.permissions import IsAuthenticated
-from User.models import EventJoiner
+from user.models import EventJoiner
 from EventManager.emails import send_email
 from .serializers import EventSerializerGet, EventSerializerPostOrUpdateOrGetForOrganizerSerializer
 from .models import Event
