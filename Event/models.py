@@ -39,7 +39,7 @@ class Event(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=5000)
     date = models.DateTimeField()
-    location_city = models.CharField(choices=CITY_CHOICES)
+    location_city = models.CharField(choices=CITY_CHOICES, max_length=255)
     organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="organizer")
     user = models.ManyToManyField(User, related_name="joined_event")
     age_limit = models.BooleanField(default=False)
