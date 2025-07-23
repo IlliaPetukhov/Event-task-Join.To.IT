@@ -37,8 +37,9 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'drf_yasg',
     'django_filters',
-    'Event.apps.EventConfig',
-    'User',
+    'event.apps.EventConfig',
+    'user',
+    'authentication',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -153,10 +154,15 @@ AUTH_PASSWORD_VALIDATORS = [
         }
     },
     {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "NAME": "django_password_validators.password_character_requirements.password_validation.PasswordCharacterValidator",
+        "OPTIONS": {
+            "min_length_digit": 1,
+            "min_length_alpha": 1,
+            "min_length_special": 1,
+            "min_length_lower": 1,
+            "min_length_upper": 1,
+            "min_length_special": 0,
+        }
     },
 ]
 

@@ -15,8 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from Event.views import EventViewSet
-from User.views import UserViewSet, OrganizerViewSet, LoginView
+from event.views import EventViewSet
+from user.views import UserViewSet, OrganizerViewSet
+from authentication.views import LoginView, RegistrationView
 from rest_framework import routers
 from django.urls import path
 from django.urls import include
@@ -49,7 +50,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include(router.urls)),
     path('__debug__/', include(debug_toolbar.urls)),
-    path("login/", LoginView.as_view(), name="login"),
+    path("auth/login/", LoginView.as_view(), name="login"),
+    path("auth/registration/", RegistrationView.as_view(), name="registration"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
